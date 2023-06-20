@@ -8,33 +8,69 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
-    <title>Data CO2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
 
     <style>
-        .table-container {
-            height: 400px;
-            /* Altura máxima del contenedor */
-            overflow-y: auto;
-            /* Agrega desplazamiento vertical */
-        }
+        body {
+    font-size: 90px;
+    font-family: 'Black Ops One', cursive;
+    background-color: rgb(10, 8, 22);
+}
+
+h1 {
+    font-size: 300px;
+}
+
+
+
+
+@media (max-width: 140px) and (max-height: 100px) {
+    hr {
+        margin-top: 0.5px;
+        margin-bottom: 0.5px;
+    }
+    p {
+        font-size: 10px;
+        margin-bottom: 0px;
+    }
+    h1 {
+        font-size: 20px;
+    }
+
+}
     </style>
+
+    <title>DATA</title>
 </head>
 
-<body class="bg-dark m-0 vh-100 row justify-content-center align-items-center">
+<body>
 
-    <div class="d-flex align-items-center justify-content-center">
-        <div class="card text-center bg-dark"
-            style="width: 500px; height: 270px; border-radius: 30px; box-shadow: 15px 15px 30px rgb(25, 25, 25), -15px -15px 30px rgb(60, 60, 60);">
-            <div class="card-body">
-                <h5 class="card-title text-warning">Dato de CO2</h5>
-                <p class="card-text text-white" id="co2-value" style="font-size: 90px;"></p>
-                <p class="text-center text-white" style="font-size: 30px;">ppm</p>
-            </div>
+    <div class="container mt-3">
+
+        <p class="text-warning text-center">CO<sub>2</sub> MONITOR</p>
+        <hr class="text-warning">
+
+        <div class="d-flex justify-content-between align-items-center text-primary">
+            <p>CO<sub>2</sub></p>
+            <h1 id="co2-value" class="text-center"></h1>
+            <p>ppm</p>
         </div>
+
+        <hr class="text-primary">
+
+        <div class="d-flex justify-content-around align-items-center text-primary">
+            <p>Calidad:</p>
+            <!-- <i id="wind-icon" class="fa-solid fa-wind"></i> -->
+            <p id="status-text"></p>
+        </div>
+
     </div>
 
     <script>
@@ -43,34 +79,68 @@
 
         function fetchData() {
             // Realiza una solicitud GET al API para obtener los datos
-            fetch('http://45.71.181.109:3001/api/sensors?id_team=12&id_sensor=14')
+            fetch('http://45.71.181.109:3001/api/sensors?id_team=21&id_sensor=23')
                 .then(response => response.json())
                 .then(data => {
+
                     // Actualiza el valor del dato de CO2 en el card
                     document.getElementById('co2-value').textContent = data.msg[0].value_data;
+                    console.log(data.msg[0].value_data);
+
 
                     // Agrega el dato al array
                     co2Data.push(data.msg[0].value_data);
 
-                    // Actualiza la tabla
-                    updateTable();
+                    // Actualiza el color del icono y el texto
+                    updateColor();
                 })
                 .catch(error => {
                     console.log('Error:', error);
                 });
         }
 
+        function updateColor() {
+            var co2Value = co2Data[co2Data.length - 1];
+            // var windIcon = document.getElementById('wind-icon');
+            var statusText = document.getElementById('status-text');
+
+
+            if (co2Value < 1) {
+                // windIcon.style.color = 'white';
+                statusText.style.color = 'white';
+                statusText.textContent = 'Apagado';
+            } else if (co2Value < 700) {
+                // windIcon.style.color = 'green';
+                statusText.style.color = 'green';
+                statusText.textContent = 'Excelente';
+            } else if (co2Value < 800) {
+                // windIcon.style.color = 'yellow';
+                statusText.style.color = 'yellow';
+                statusText.textContent = 'Bueno';
+            } else if (co2Value < 1100) {
+                // windIcon.style.color = 'orange';
+                statusText.style.color = 'orange';
+                statusText.textContent = 'Normal';
+            } else if (co2Value < 1500) {
+                // windIcon.style.color = 'red';
+                statusText.style.color = 'red';
+                statusText.textContent = 'Malo';
+            } else {
+                // windIcon.style.color = 'purple';
+                statusText.style.color = 'purple';
+                statusText.textContent = 'Muy malo';
+            }
+        }
+
+
         // Actualiza los datos cada 3 segundos
-        setInterval(fetchData, 3000);
+        setInterval(fetchData, 1000);
 
         // Inicializa la obtención de datos al cargar la página
-        document.addEventListener("DOMContentLoaded", (e) => {
-            fetchData();
-        });
+        // document.addEventListener("DOMContentLoaded", (e) => {
+        // });
+        fetchData();
     </script>
-
-
-
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
         integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
@@ -78,6 +148,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
         integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
         crossorigin="anonymous"></script>
+
 </body>
 
 </html>
